@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveNoteBtn = document.querySelector(".save-note");
   const clearBtn = document.querySelector(".clear-btn");
   const noteList = document.querySelector("#list-group");
+  const newNoteBtn = document.querySelector(".new-note");
 
   // Function to render list of notes
   const renderNoteList = (notes) => {
@@ -105,6 +106,33 @@ document.addEventListener("DOMContentLoaded", () => {
     noteText.value = "";
     hide(saveNoteBtn);
     hide(clearBtn);
+  });
+
+  // Event listener to handle click on "New Note" button
+  newNoteBtn.addEventListener("click", () => {
+    noteTitle.value = "";
+    noteText.value = "";
+    hide(saveNoteBtn);
+    hide(clearBtn);
+  });
+
+  // Event listener to handle click on notes in the list
+  noteList.addEventListener("click", (e) => {
+    if (e.target.classList.contains("list-item-title")) {
+      const noteId = e.target.parentElement.dataset.noteId;
+      fetch(`/api/notes/${noteId}`)
+        .then((res) => res.json())
+        .then((note) => {
+          noteTitle.value = note.title;
+          noteText.value = note.text;
+          hide(saveNoteBtn);
+          hide(clearBtn);
+        })
+        .catch((error) => console.error("Error fetching note:", error));
+    } else if (e.target.classList.contains("delete-note")) {
+      const noteId = e.target.parentElement.dataset.noteId;
+      deleteNote(noteId);
+    }
   });
 
   // Initial call to fetch notes
