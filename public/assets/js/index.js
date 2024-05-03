@@ -7,6 +7,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const clearBtn = document.querySelector(".clear-btn");
   const noteList = document.querySelector("#list-group");
 
+  // Function to show or hide the buttons based on input fields
+  const handleRenderBtns = () => {
+    if (noteTitle.value.trim() && noteText.value.trim()) {
+      show(saveNoteBtn);
+      show(clearBtn);
+    } else {
+      hide(saveNoteBtn);
+      hide(clearBtn);
+    }
+  };
+
+  // Show an element
+  const show = (elem) => {
+    elem.style.display = "inline";
+  };
+
+  // Hide an element
+  const hide = (elem) => {
+    elem.style.display = "none";
+  };
+
+  // Render list of notes
   const renderNoteList = (notes) => {
     noteList.innerHTML = "";
     notes.forEach((note) => {
@@ -18,12 +40,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
+  // Function to get notes from the server
   const getNotes = () => {
     fetch("/api/notes")
       .then((res) => res.json())
       .then(renderNoteList);
   };
 
+  // Function to save a new note
   const saveNote = (note) => {
     fetch("/api/notes", {
       method: "POST",
@@ -36,13 +60,15 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(getNotes);
   };
 
+  // Function to delete a note
   const deleteNote = (noteId) => {
     fetch(`/api/notes/${noteId}`, {
       method: "DELETE",
     }).then(getNotes);
   };
 
-  const handleNoteSave = (e) => {
+  // Event listener to handle form submission (save new note)
+  noteForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const newNote = {
       title: noteTitle.value.trim(),
@@ -53,16 +79,18 @@ document.addEventListener("DOMContentLoaded", () => {
       noteTitle.value = "";
       noteText.value = "";
     }
-  };
+  });
 
-  const handleNoteDelete = (e) => {
+  // Event listener to handle deletion of a note
+  noteList.addEventListener("click", (e) => {
     if (e.target.classList.contains("delete-note")) {
       const noteId = e.target.parentElement.dataset.noteId;
       deleteNote(noteId);
     }
-  };
+  });
 
-  const handleNoteView = (e) => {
+  // Event listener to handle viewing a note
+  noteList.addEventListener("click", (e) => {
     if (e.target.matches(".list-group-item")) {
       const noteId = e.target.dataset.noteId;
       fetch(`/api/notes/${noteId}`)
@@ -72,11 +100,12 @@ document.addEventListener("DOMContentLoaded", () => {
           noteText.value = note.text;
         });
     }
-  };
+  });
 
+  // Event listeners to show/hide buttons based on input
+  noteTitle.addEventListener("input", handleRenderBtns);
+  noteText.addEventListener("input", handleRenderBtns);
+
+  // Initial call to fetch notes
   getNotes();
-
-  noteForm.addEventListener("submit", handleNoteSave);
-  noteList.addEventListener("click", handleNoteDelete);
-  noteList.addEventListener("click", handleNoteView);
 });
