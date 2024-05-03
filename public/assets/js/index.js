@@ -36,6 +36,10 @@ document.addEventListener("DOMContentLoaded", () => {
       body: JSON.stringify(note),
     })
       .then(getNotes)
+      .then(() => {
+        hide(saveNoteBtn);
+        hide(clearBtn);
+      })
       .catch((error) => console.error("Error saving note:", error));
   };
 
@@ -125,8 +129,8 @@ document.addEventListener("DOMContentLoaded", () => {
         .then((note) => {
           noteTitle.value = note.title;
           noteText.value = note.text;
-          hide(saveNoteBtn);
-          hide(clearBtn);
+          show(saveNoteBtn);
+          show(clearBtn);
         })
         .catch((error) => console.error("Error fetching note:", error));
     } else if (e.target.classList.contains("delete-note")) {
