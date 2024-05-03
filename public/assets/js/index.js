@@ -3,32 +3,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const noteTitle = document.querySelector(".note-title");
   const noteText = document.querySelector(".note-textarea");
   const saveNoteBtn = document.querySelector(".save-note");
-  const newNoteBtn = document.querySelector(".new-note");
   const clearBtn = document.querySelector(".clear-btn");
   const noteList = document.querySelector("#list-group");
 
-  // Function to show or hide the buttons based on input fields
-  const handleRenderBtns = () => {
-    if (noteTitle.value.trim() && noteText.value.trim()) {
-      show(saveNoteBtn);
-      show(clearBtn);
-    } else {
-      hide(saveNoteBtn);
-      hide(clearBtn);
-    }
-  };
-
-  // Show an element
-  const show = (elem) => {
-    elem.style.display = "inline";
-  };
-
-  // Hide an element
-  const hide = (elem) => {
-    elem.style.display = "none";
-  };
-
-  // Render list of notes
+  // Function to render list of notes
   const renderNoteList = (notes) => {
     noteList.innerHTML = "";
     notes.forEach((note) => {
@@ -40,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  // Function to get notes from the server
+  // Function to fetch notes from server
   const getNotes = () => {
     fetch("/api/notes")
       .then((res) => res.json())
@@ -56,16 +34,43 @@ document.addEventListener("DOMContentLoaded", () => {
       },
       body: JSON.stringify(note),
     })
-      .then((res) => res.json())
-      .then(getNotes);
+      .then(getNotes)
+      .catch((error) => console.error("Error saving note:", error));
   };
 
   // Function to delete a note
   const deleteNote = (noteId) => {
     fetch(`/api/notes/${noteId}`, {
       method: "DELETE",
-    }).then(getNotes);
+    })
+      .then(getNotes)
+      .catch((error) => console.error("Error deleting note:", error));
   };
+
+  // Function to show or hide buttons based on input fields
+  const handleRenderBtns = () => {
+    if (noteTitle.value.trim() && noteText.value.trim()) {
+      show(saveNoteBtn);
+      show(clearBtn);
+    } else {
+      hide(saveNoteBtn);
+      hide(clearBtn);
+    }
+  };
+
+  // Function to show an element
+  const show = (elem) => {
+    elem.style.display = "inline";
+  };
+
+  // Function to hide an element
+  const hide = (elem) => {
+    elem.style.display = "none";
+  };
+
+  // Event listeners for input fields
+  noteTitle.addEventListener("input", handleRenderBtns);
+  noteText.addEventListener("input", handleRenderBtns);
 
   // Event listener to handle form submission (save new note)
   noteForm.addEventListener("submit", (e) => {
@@ -81,30 +86,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Event listener to handle deletion of a note
-  noteList.addEventListener("click", (e) => {
-    if (e.target.classList.contains("delete-note")) {
-      const noteId = e.target.parentElement.dataset.noteId;
-      deleteNote(noteId);
+  // Event listener to handle click on "Save Note" button
+  saveNoteBtn.addEventListener("click", () => {
+    const newNote = {
+      title: noteTitle.value.trim(),
+      text: noteText.value.trim(),
+    };
+    if (newNote.title && newNote.text) {
+      saveNote(newNote);
+      noteTitle.value = "";
+      noteText.value = "";
     }
   });
 
-  // Event listener to handle viewing a note
-  noteList.addEventListener("click", (e) => {
-    if (e.target.matches(".list-group-item")) {
-      const noteId = e.target.dataset.noteId;
-      fetch(`/api/notes/${noteId}`)
-        .then((res) => res.json())
-        .then((note) => {
-          noteTitle.value = note.title;
-          noteText.value = note.text;
-        });
-    }
+  // Event listener to handle click on "Clear Form" button
+  clearBtn.addEventListener("click", () => {
+    noteTitle.value = "";
+    noteText.value = "";
+    hide(saveNoteBtn);
+    hide(clearBtn);
   });
-
-  // Event listeners to show/hide buttons based on input
-  noteTitle.addEventListener("input", handleRenderBtns);
-  noteText.addEventListener("input", handleRenderBtns);
 
   // Initial call to fetch notes
   getNotes();
