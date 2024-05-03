@@ -129,8 +129,9 @@ document.addEventListener("DOMContentLoaded", () => {
         .then((note) => {
           noteTitle.value = note.title;
           noteText.value = note.text;
-          show(saveNoteBtn);
-          show(clearBtn);
+          hide(saveNoteBtn);
+          hide(clearBtn);
+          show(newNoteBtn); // Show the "New Note" button
         })
         .catch((error) => console.error("Error fetching note:", error));
     } else if (e.target.classList.contains("delete-note")) {
