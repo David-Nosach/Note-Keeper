@@ -1,4 +1,6 @@
+// This section runs once the DOM content is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
+  // Getting references to various elements on the page
   const noteForm = document.querySelector(".note-form");
   const noteTitle = document.querySelector(".note-title");
   const noteText = document.querySelector(".note-textarea");
@@ -7,19 +9,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const noteList = document.querySelector("#list-group");
   const newNoteBtn = document.querySelector(".new-note");
 
-  // Function to render list of notes
+  // Function to render the list of notes on the page
   const renderNoteList = (notes) => {
     noteList.innerHTML = "";
     notes.forEach((note) => {
-      const li = document.createElement("li");
-      li.classList.add("list-group-item");
-      li.innerHTML = `<span class="list-item-title">${note.title}</span><i class="fas fa-trash-alt float-right text-danger delete-note"></i>`;
-      li.dataset.noteId = note.id;
-      noteList.appendChild(li);
+      if (note.title !== "Test Title") {
+        // Exclude the note titled "Test Title" from being rendered
+        const li = document.createElement("li");
+        li.classList.add("list-group-item");
+        li.innerHTML = `<span class="list-item-title">${note.title}</span><i class="fas fa-trash-alt float-right text-danger delete-note"></i>`;
+        li.dataset.noteId = note.id;
+        noteList.appendChild(li);
+      }
     });
   };
 
-  // Function to fetch notes from server
+  // Function to fetch notes from the server and render them
   const getNotes = () => {
     fetch("/api/notes")
       .then((res) => res.json())
@@ -35,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
       },
       body: JSON.stringify(note),
     })
-      .then(getNotes)
+      .then(getNotes) // After saving, fetch and render the updated notes list
       .catch((error) => console.error("Error saving note:", error));
   };
 
@@ -44,16 +49,16 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch(`/api/notes/${noteId}`, {
       method: "DELETE",
     })
-      .then(getNotes)
+      .then(getNotes) // After deletion, fetch and render the updated notes list
       .catch((error) => console.error("Error deleting note:", error));
   };
 
-  // Function to show an element
+  // Function to show an HTML element
   const show = (elem) => {
     elem.style.display = "inline";
   };
 
-  // Function to hide an element
+  // Function to hide an HTML element
   const hide = (elem) => {
     elem.style.display = "none";
   };
@@ -63,18 +68,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const title = noteTitle.value.trim();
     const text = noteText.value.trim();
 
+    // Show or hide the clear button based on whether there's content in the input fields
     if (title || text) {
       show(clearBtn);
     } else {
       hide(clearBtn);
     }
 
+    // Show or hide the save button based on whether both title and text fields have content
     if (title && text) {
       show(saveNoteBtn);
     } else {
       hide(saveNoteBtn);
     }
 
+    // Show or hide the new note button based on whether it's already clicked and whether there's content in the input fields
     if (!title && !text && !newNoteBtn.classList.contains("clicked")) {
       show(newNoteBtn);
     } else {
@@ -117,16 +125,16 @@ document.addEventListener("DOMContentLoaded", () => {
   clearBtn.addEventListener("click", () => {
     noteTitle.value = "";
     noteText.value = "";
-    hide(saveNoteBtn);
-    hide(clearBtn);
+    hide(saveNoteBtn); // Hide the save button after clearing the form
+    hide(clearBtn); // Hide the clear button after clearing the form
   });
 
   // Event listener to handle click on "New Note" button
   newNoteBtn.addEventListener("click", () => {
     noteTitle.value = "";
     noteText.value = "";
-    newNoteBtn.classList.add("clicked");
-    handleRenderBtns();
+    newNoteBtn.classList.add("clicked"); // Add a class to track if the new note button is clicked
+    handleRenderBtns(); // Call the function to handle rendering buttons
   });
 
   // Event listener to handle click on notes in the list
@@ -149,6 +157,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Initial call to fetch notes
+  // Initial call to fetch notes when the page is loaded
   getNotes();
 });
