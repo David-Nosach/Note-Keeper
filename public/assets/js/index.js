@@ -36,10 +36,6 @@ document.addEventListener("DOMContentLoaded", () => {
       body: JSON.stringify(note),
     })
       .then(getNotes)
-      .then(() => {
-        hide(saveNoteBtn);
-        hide(clearBtn);
-      })
       .catch((error) => console.error("Error saving note:", error));
   };
 
@@ -52,17 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch((error) => console.error("Error deleting note:", error));
   };
 
-  // Function to show or hide buttons based on input fields
-  const handleRenderBtns = () => {
-    if (noteTitle.value.trim() && noteText.value.trim()) {
-      show(saveNoteBtn);
-      show(clearBtn);
-    } else {
-      hide(saveNoteBtn);
-      hide(clearBtn);
-    }
-  };
-
   // Function to show an element
   const show = (elem) => {
     elem.style.display = "inline";
@@ -71,6 +56,30 @@ document.addEventListener("DOMContentLoaded", () => {
   // Function to hide an element
   const hide = (elem) => {
     elem.style.display = "none";
+  };
+
+  // Function to handle rendering buttons based on input fields
+  const handleRenderBtns = () => {
+    const title = noteTitle.value.trim();
+    const text = noteText.value.trim();
+
+    if (title || text) {
+      show(clearBtn);
+    } else {
+      hide(clearBtn);
+    }
+
+    if (title && text) {
+      show(saveNoteBtn);
+    } else {
+      hide(saveNoteBtn);
+    }
+
+    if (!title && !text && !newNoteBtn.classList.contains("clicked")) {
+      show(newNoteBtn);
+    } else {
+      hide(newNoteBtn);
+    }
   };
 
   // Event listeners for input fields
@@ -116,8 +125,8 @@ document.addEventListener("DOMContentLoaded", () => {
   newNoteBtn.addEventListener("click", () => {
     noteTitle.value = "";
     noteText.value = "";
-    hide(saveNoteBtn);
-    hide(clearBtn);
+    newNoteBtn.classList.add("clicked");
+    handleRenderBtns();
   });
 
   // Event listener to handle click on notes in the list
@@ -131,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
           noteText.value = note.text;
           hide(saveNoteBtn);
           hide(clearBtn);
-          show(newNoteBtn); // Show the "New Note" button
+          show(newNoteBtn);
         })
         .catch((error) => console.error("Error fetching note:", error));
     } else if (e.target.classList.contains("delete-note")) {
