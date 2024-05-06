@@ -4,6 +4,8 @@
 
 Note Taker is a simple web application built with Express.js that allows users to create, save, view, and delete notes. It provides a user-friendly interface for managing personal notes efficiently.
 
+<img width="1440" alt="Screen Shot 2024-05-06 at 1 11 43 PM" src="https://github.com/David-Nosach/Note-Keeper/assets/91391933/f299ca29-2662-470a-9557-fa4bb77aa00e">
+
 ## Features
 
 - **Create Notes:** Users can create new notes by providing a title and content for each note.
