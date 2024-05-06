@@ -22,7 +22,6 @@ Note Taker is a simple web application built with Express.js that allows users t
 ## Installation
 
 1. Clone the repository:
-   git clone https://github.com/yourusername/note-taker.git
 2. Navigate to the project directory:
 3. Install dependecies
    npm install
